@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0"/>
+    <meta content="yes" name="apple-mobile-web-app-capable">
+    <meta content="black" name="apple-mobile-web-app-status-bar-style">
+    <meta content="telephone=no" name="format-detection">
+    <title>传智云购-购物车</title>
+    <link type="image/x-icon" rel="shortcut icon" href="images/favicon.ico">
+    <link rel="stylesheet" href="res/mui/css/mui.min.css"/>
+    <link rel="stylesheet" href="res/fontAwesome/css/font-awesome.min.css"/>
+    <link rel="stylesheet" href="css/common.css"/>
+    <link rel="stylesheet" href="css/cart.css"/>
+    <style>
+        .cz_container {
+            padding-top: 0;
+            margin-top: 45px;
+        }
+    </style>
+</head>
+<body>
+    <div class="cz_layout">
+        <header class="cz_topBar">
+            <a href="javascript:history.back();" class="icon_back fa fa-arrow-left"></a>
+            <span class="title">购物车</span>
+            <a href="javascript:;" class="icon_refresh fa fa-refresh"></a>
+        </header>
+        <div class="cz_container mui-content mui-scroll-wrapper">
+            <div class="mui-scroll">
+                <ul class="mui-table-view mui-table-view-chevron" id="cart">
+                </ul>
+            </div>
+            <div class="cart_order">订单总额：&yen;1022.00 <a href="#">生成订单</a></div>
+        </div>
+        <footer class="cz_tabs">
+            <a class="tab_home fa fa-home" href="index.html"><span>首页</span></a>
+            <a class="tab_cate fa fa-bars" href="cate.html"><span>分类</span></a>
+            <a class="tab_cart fa fa-shopping-cart now" href="cart.html"><span>购物车</span></a>
+            <a class="tab_user fa fa-user" href="user/index.html"><span>会员中心</span></a>
+        </footer>
+    </div>
+    <!-- 模板 -->
+    <script type="text/html" id="tpl">
+        {{each data as val}}
+        <li data-product="" class="mui-table-view-cell">
+            <div class="mui-slider-right mui-disabled">
+                <a class="mui-btn mui-btn-blue">编辑</a>
+                <a class="mui-btn mui-btn-red">删除</a>
+            </div>
+            <a href="javascript:;" class="mui-navigate-right mui-slider-handle">
+                <img class="mui-media-object mui-pull-left" src="/api{{val.pic[0].picAddr}}">
+                <div class="mui-media-body">
+                    <p class="name">{{val.proName}}</p>
+                    <p class="info">
+                        <span class="price">&yen;{{val.price}}</span>
+                        <span class="oldPrice">&yen;{{val.oldPrice}}</span>
+                        <span class="number">x{{val.num}}</span>
+                    </p>
+                    <p><span class="size">鞋码：{{val.size}}</span></p>
+                </div>
+                <input type="checkbox"/>
+            </a>
+        </li>
+        {{/each}}
+    </script>
+    <script src="./js/jquery.min.js"></script>
+    <script src="./js/template-web.js"></script>
+    <script src="./res/mui/js/mui.min.js"></script>
+    <script>
+        
+        var page = 1;
+        var pageSize = 5;
+
+        mui.init({
+            pullRefresh : {
+                container:".cz_container",
+                // 下接刷新
+                down: {
+                    height: 50,
+                    auto: true,
+                    contentdown: "下拉可以刷新",
+                    contentover: "释放立即刷新",
+                    contentrefresh: "正在刷新...",
+                    callback: function () {
+                        // 当松开手时会调用该函数
+                        // 在这里编写的刷新的逻辑
+
+                        // 刷新永远为第1页
+                        page = 1;
+                        // 发送请求获取购物车列表
+                        $.ajax({
+                            url: '/api/cart/queryCartPaging',
+                            type: 'get',
+                            data: {
+                                page: page,
+                                pageSize: pageSize
+                            },
+                            success: function (info) {
+                                // 未登录
+                                if(info.error) return location.href = '/user/login.html?url=' + location.href;
+
+                                // 调用模板引擎
+                                // console.log(info);
+                                var html = template('tpl', info);
+                                // 添加DOM
+                                $('#cart').html(html);
+
+                                // 加载完成了!!!
+                                mui('.cz_container').pullRefresh().endPulldownToRefresh();
+                            }
+                        })
+                    }
+                },
+                up: {
+                    height: 50,
+                    auto: false,
+                    contentrefresh: "正在加载...",
+                    contentnomore: '没有更多数据了',
+                    callback: function () {
+                        // 取下一页的数据
+                        page += 1;
+
+                        // 启用上拉刷新
+                        mui('.cz_container').pullRefresh().enablePullupToRefresh();
+
+                        $.ajax({
+                            url: '/api/cart/queryCartPaging',
+                            type: 'get',
+                            data: {
+                                page: page,
+                                pageSize: pageSize
+                            },
+                            success: function (info) {
+                                // 没有更多数据了
+                                if(info.length == 0) {
+                                    mui('.cz_container').pullRefresh().disablePullupToRefresh();
+                                }
+
+                                // 调用模板引擎
+                                var html = template('tpl', info);
+
+                                // 添加DOM
+                                $('#cart').append(html);
+
+                                // 加载完成了!!!
+                                mui('.cz_container').pullRefresh().endPullupToRefresh();
+                            }
+                        })
+                    }
+                }
+            }
+        });
+
+        mui(function() {
+            mui('.mui-scroll-wrapper').scroll({
+                scrollY: true, //是否竖向滚动
+                scrollX: false, //是否横向滚动
+                startX: 0, //初始化时滚动至x
+                startY: 0, //初始化时滚动至y
+                indicators: false, //是否显示滚动条
+                deceleration:0.0006, //阻尼系数,系数越小滑动越灵敏
+                bounce: true, //是否启用回弹
+            });
+        });
+    </script>
+</body>
+</html>

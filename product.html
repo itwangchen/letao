@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0"/>
+    <meta content="yes" name="apple-mobile-web-app-capable">
+    <meta content="black" name="apple-mobile-web-app-status-bar-style">
+    <meta content="telephone=no" name="format-detection">
+    <title>传智云购-搜索中心</title>
+    <link type="image/x-icon" rel="shortcut icon" href="images/favicon.ico">
+    <link rel="stylesheet" href="res/mui/css/mui.min.css"/>
+    <link rel="stylesheet" href="res/fontAwesome/css/font-awesome.min.css"/>
+    <link rel="stylesheet" href="css/common.css"/>
+    <link rel="stylesheet" href="css/product.css"/>
+    <style>
+        .active {
+            background-color: pink;
+        }
+    </style>
+</head>
+<body>
+    <div class="cz_layout">
+        <header class="cz_topBar">
+            <a href="javascript:history.back();" class="icon_back fa fa-arrow-left"></a>
+            <span class="title">商品详情</span>
+            <a href="index.html" class="icon_home fa fa-home"></a>
+        </header>
+        <div class="cz_container ">
+            <div class="mui-scroll-wrapper">
+                <div class="mui-scroll" id="detail">
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="p_option">
+        <a href="/cart.html" class="btn_cart fa fa-shopping-cart"></a>
+        <a href="javascript:;" class="btn_addCart">加入购物车</a>
+        <a href="#" class="btn_pay">立即购买</a>
+    </div>
+    <!-- 模板 -->
+    <script type="text/html" id="tpl">
+        <div class="cz_banner mui-slider">
+            <div class="mui-slider-group mui-slider-loop">
+                <div class="mui-slider-item mui-slider-item-duplicate">
+                    <a href="#"><img src="images/product.jpg"></a>
+                </div>
+                <div class="mui-slider-item mui-active">
+                    <a href="#"><img src="images/product.jpg"></a>
+                </div>
+                <div class="mui-slider-item mui-active">
+                    <a href="#"><img src="images/product.jpg"></a>
+                </div>
+                <div class="mui-slider-item mui-slider-item-duplicate">
+                    <a href="#"><img src="images/product.jpg"></a>
+                </div>
+            </div>
+            <div class="mui-slider-indicator">
+                <div class="mui-indicator mui-active"></div>
+                <div class="mui-indicator"></div>
+            </div>
+        </div>
+        <div class="p_title">
+            {{proName}}
+        </div>
+        <div class="p_price">
+            <span class="fold"><span>{{discount}}</span>折</span>
+            价格：<strong class="present">¥
+            {{price}}</strong>
+            <del class="original">¥{{oldPrice}}</del>
+        </div>
+        <div class="p_size">
+            尺码：
+            {{each size as val}}
+            <span class="btn_size">{{val}}</span>
+            {{/each}}
+        </div>
+        <div class="p_number">
+            数量：
+            <span class="jian  btn_num">-</span>
+            <input type="tel" class="btn_count" value="1" />
+            <span class="jia btn_num">+</span>
+            剩余：<span class="total">{{num}}</span>件
+        </div>
+        <div class="p_detail">
+            <img data-lazyload="images/detail.jpg"  alt=""/>
+            <img data-lazyload="images/detail.jpg"  alt=""/>
+            <img data-lazyload="images/detail.jpg"  alt=""/>
+            <img data-lazyload="images/detail.jpg"  alt=""/>
+            <img data-lazyload="images/detail.jpg"  alt=""/>
+            <img data-lazyload="images/detail.jpg"  alt=""/>
+        </div>
+    </script>
+    <script src="./js/jquery.min.js"></script>
+    <script src="./js/template-web.js"></script>
+    <script src="./res/mui/js/mui.min.js"></script>
+    <script>
+
+        // 根据 url 上传过来的 id 参数
+        var search = location.search.slice(1);
+
+        var arr = search.split('&');
+        var qs = {};
+
+        arr.forEach(function (val) {
+            var tmp = val.split('=');
+            qs[tmp[0]] = tmp[1];
+        })
+
+        // console.log(qs)
+
+        // 获取对应商品的详情
+        $.ajax({
+            url: '/api/product/queryProductDetail',
+            type: 'get',
+            data: {id: qs.id},
+            success: function (info) {
+                console.log(info);
+
+                // 对尺码处理
+                info.size = info.size.split('-');
+                // 折扣
+                info.discount = (info.price / info.oldPrice * 10).toFixed(1);
+
+                // 调用模板引擎
+                var html = template('tpl', info);
+
+                // 添加DOM
+                $('#detail').html(html);
+            }
+        })
+
+        // 当点击尺码时让其保持选中状态
+        $('#detail').on('click', '.btn_size', function () {
+            $(this).addClass('active').siblings().removeClass('active');
+        })
+
+        // 修改数量
+        $('#detail').on('click', '.btn_num', function () {
+            // 表单元素
+            var input = $(this).siblings('input');
+
+            var n = input.val();
+
+            // 加1
+            if($(this).is('.jia')) {
+                if(n >= $('span.total').text()) return;
+                input.val(++n);
+                return;
+            }
+
+            // 减1
+            if(n <= 1) return;
+            input.val(--n);
+        })
+
+        // 添加购物车
+        // a) 当用户点击时获取DOM中的数据，然后发送一个请求
+        // b) 等待响应结果
+        $('.btn_addCart').on('click', function () {
+
+            // DOM 数据
+            var num = $('input.btn_count').val();
+            var size = $('span.active').text();
+
+            if(num < 1) {
+                mui.alert('至少一件商品')
+                return;
+            }
+
+            if(num > 20) {
+                mui.alert('库存不够')
+                return;
+            }
+
+            if(!size) {
+                mui.alert('请选择一个尺码')
+                return;
+            }
+
+            $.ajax({
+                url: '/api/cart/addCart',
+                type: 'post',
+                data: {
+                    productId: qs.id,
+                    num: num,
+                    size: size
+                },
+                success: function (info) {
+                    console.log(info);
+                    // 未登录
+                    if(info.error) {
+                        mui.alert(
+                            '请先登录',
+                            '提示',
+                            '确认',
+                            function () {
+                                location.href = '/user/login.html?url=' + location.href;
+                            }
+                        );
+                        return;
+                    }
+
+                    // 提示
+                    mui.toast('加入购物车成功！');
+                    // 去购物车查看
+                    // location.href = '/cart.html';
+                }
+            });
+        })
+
+        mui(function(){
+            mui('.mui-slider').slider({
+                interval:3000 //自动轮播周期，若为0则不自动播放，默认为0；
+            });
+            mui('.mui-scroll-wrapper').scroll({
+                scrollY: true, //是否竖向滚动
+                scrollX: false, //是否横向滚动
+                startX: 0, //初始化时滚动至x
+                startY: 0, //初始化时滚动至y
+                indicators: false, //是否显示滚动条
+                deceleration:0.0006, //阻尼系数,系数越小滑动越灵敏
+                bounce: true, //是否启用回弹
+            });
+        });
+    </script>
+</body>
+</html>

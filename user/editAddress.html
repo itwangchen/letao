@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0"/>
+    <meta content="yes" name="apple-mobile-web-app-capable">
+    <meta content="black" name="apple-mobile-web-app-status-bar-style">
+    <meta content="telephone=no" name="format-detection">
+    <title>收货地址管理</title>
+    <link type="image/x-icon" rel="shortcut icon" href="../images/favicon.ico">
+    <link rel="stylesheet" href="../res/mui/css/mui.min.css"/>
+    <link rel="stylesheet" href="../res/fontAwesome/css/font-awesome.min.css"/>
+    <link rel="stylesheet" href="../css/common.css"/>
+    <link rel="stylesheet" href="../css/user.css"/>
+</head>
+<body>
+    <div class="cz_layout bgg">
+        <header class="cz_topBar">
+            <a href="javascript:history.back();" class="icon_back fa fa-arrow-left"></a>
+            <span class="title">收货地址管理</span>
+        </header>
+        <div class="cz_container">
+            <form>
+            
+            </form>
+        </div>
+        <footer class="cz_tabs">
+            <a class="tab_home fa fa-home" href="../index.html"><span>首页</span></a>
+            <a class="tab_cate fa fa-bars" href="../cate.html"><span>分类</span></a>
+            <a class="tab_cart fa fa-shopping-cart" href="../cart.html"><span>购物车</span></a>
+            <a class="tab_user fa fa-user" href="../user/index.html"><span>会员中心</span></a>
+        </footer>
+    </div>
+    <!-- 模板 -->
+    <script type="text/html" id="tpl">
+        <input type="hidden" name="id" value="{{id}}">
+        <div class="form_box">
+            <div class="mui-input-row">
+                <input name="recipients" type="text" value="{{recipients}}" placeholder="收货人">
+            </div>
+            <div class="mui-input-row">
+                <input name="postcode" type="text" value="{{postCode}}" placeholder="邮编">
+            </div>
+            <div class="mui-input-row">
+                <input name="address" type="text" value="{{address}}" placeholder="省市县">
+            </div>
+            <div class="mui-input-row">
+                <textarea name="addressDetail" id="textarea" rows="5" placeholder="多行文本框">{{addressDetail}}</textarea>
+            </div>
+            <button class="mui-btn mui-btn-primary btn_login">确认</button>
+        </div>
+    </script>
+    <script type="text/javascript" src="../js/jquery.min.js"></script>
+    <script type="text/javascript" src="../js/template-web.js"></script>
+    <script src="../res/mui/js/mui.min.js"></script>
+    <script type="text/javascript">
+        // 根据地址的 id 先将原来的数据查出来
+        // 更进行修改，将修改数据再次提交给服务端
+
+        // 1. 获取地址 id
+        var search = location.search.slice(1);
+
+        // 准备接收处理后的地址参数
+        var qs = {};
+
+        // console.log(search)
+        // a) 将 search 按着 & 符号进行拆分
+        var arr = search.split('&');
+        // console.log(arr)
+        arr.forEach(function (val) {
+            // console.log(val);
+            // b) 将拆分后的数组进行遍历，再以 = 进行拆分
+            var tmp = val.split('=');
+
+            // console.log(tmp); // tmp[0]
+
+            // 将解析的结果，添加至 qs 对象
+            qs[tmp[0]] = tmp[1];
+        })
+
+        // console.log(qs);
+
+        // 根据 id 查询原来的数据
+        $.ajax({
+            url: '/api/address/queryAddress',
+            type: 'get',
+            success: function (info) {
+                // 未登录
+                if(info.error) return location.href = '/user/login.html?url=' + location.href;
+
+                // console.log(info);
+
+                var lists = info.filter(function (val) {
+                    return val.id == qs.id;
+                })
+
+                // console.log(lists);
+
+                // 调用模板引擎
+                var html = template('tpl', lists[0]);
+                // 添加DOM
+                $('form').html(html);
+
+                // var lists = [];
+
+                // info.forEach(function (val) {
+                //     if(val.id == qs.id) {
+                //         lists.push(val)
+                //     }
+                // })
+            }
+        })
+
+        // 当用户提交表单时，获取用户修改后的信息
+        // 发送到服务端，等待结果
+        $('form').on('submit', function () {
+
+            // 1. 获取数据
+            var data = $(this).serialize();
+
+            // 2. 发送请求
+            $.ajax({
+                url: '/api/address/updateAddress',
+                type: 'post',
+                data: data,
+                success: function (info) {
+                    console.log(info);
+                    // 未登录
+                    if(info.error) return location.href = '/user/login.html?url=' + location.href;
+
+                    // 修改成后
+                    location.href = '/user/address.html';
+                }
+            })
+
+            // 阻止表单默认提交
+            return false;
+        })
+    </script>
+</body>
+</html>

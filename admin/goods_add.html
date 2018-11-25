@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>乐淘 - 后台管理</title>
+    <link rel="stylesheet" href="./assets/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="./assets/font-awesome/css/font-awesome.css">
+    <link rel="stylesheet" href="./assets/nprogress/nprogress.css">
+    <link rel="stylesheet" href="./css/index.css">
+</head>
+
+<body>
+
+    <!-- 侧边栏 -->
+    <div class="aside">
+        <!-- 个人资料 -->
+        <div class="profile">
+            <!-- 头像 -->
+            <div class="avatar img-circle">
+                <img src="./uploads/avatar.jpg">
+            </div>
+            <h4>布头儿</h4>
+        </div>
+        <!-- 导航菜单 -->
+        <div class="navs">
+            <ul class="list-unstyled">
+                <li>
+                    <a href="./index.html">
+                        <i class="fa fa-dashboard"></i>
+                        仪表盘
+                    </a>
+                </li>
+                <li>
+                    <a href="./user_list.html">
+                        <i class="fa fa-group"></i>
+                        用户管理
+                    </a>
+                </li>
+                <li>
+                    <a href="javascript:;">
+                        <i class="fa fa-indent"></i>
+                        分类管理
+                        <i class="arrow fa fa-angle-right"></i>
+                    </a>
+                    <ul class="list-unstyled">
+                        <li>
+                            <a href="./category.html">
+                                一级分类
+                            </a>
+                        </li>
+                        <li>
+                            <a href="./brand.html">
+                                二级分类
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="./goods_list.html">
+                        <i class="fa fa-cubes pull-left"></i>
+                        商品管理
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <!-- 主体 -->
+    <div class="main">
+        <div class="container-fluid">
+            <!-- 头部 -->
+            <div class="header">
+                <nav class="navbar navbar-custom">
+                    <div class="navbar-header">
+                        <a href="javascript:;" class="navbar-brand">
+                            <i class="fa fa-navicon"></i>
+                        </a>
+                    </div>
+                    <ul class="nav navbar-nav navbar-right">
+                        <li>
+                            <a href="./settings.html">
+                                <i class="fa fa-user"></i>
+                                个人中心
+                            </a>
+                        </li>
+                        <li>
+                            <a href="javascript:;">
+                                <i class="fa fa-sign-out"></i>
+                                退出
+                            </a>
+                        </li>
+                        <li>
+                            <a href="javascript:;">
+                                <i class="fa fa-tasks"></i>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+            <!-- 讲师资料 -->
+            <div class="body">
+                <div class="goods-add">
+                    <form action="" class="form-horizontal">
+                        <div class="form-group">
+                            <label for="" class="col-xs-3 control-label">商品封面</label>
+                            <div class="col-xs-2 preview">
+                                <img src="./images/default.png">
+                                <input type="file" id="upfile">
+                                <div class="cover">
+                                    <i class="fa fa-upload"></i>
+                                </div>
+                                <input type="hidden" name="pic">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="" class="col-xs-3 control-label">商品名称</label>
+                            <div class="col-xs-5">
+                                <input type="text" name="proName" class="form-control input-sm">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="" class="col-xs-3 control-label">所属品牌</label>
+                            <div class="col-xs-5">
+                                <select name="brandId" class="form-control input-sm">
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="" class="col-xs-3 control-label">商品价格</label>
+                            <div class="col-xs-5">
+                                <input type="text" name="oldPrice" class="form-control input-sm">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="" class="col-xs-3 control-label">优惠价格</label>
+                            <div class="col-xs-5">
+                                <input type="text" name="price" class="form-control input-sm">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="" class="col-xs-3 control-label">库存量</label>
+                            <div class="col-xs-5">
+                                <input type="text" name="num" class="form-control input-sm">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="" class="col-xs-3 control-label">型号</label>
+                            <div class="col-xs-5">
+                                <input type="text" name="size" class="form-control input-sm">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="" class="col-xs-3 control-label">是否上下架</label>
+                            <div class="col-xs-5">
+                                <div class="radio-inline">
+                                    <input type="radio" value="1" name="statu">是
+                                </div>
+                                <div class="radio-inline">
+                                    <input type="radio" value="0" name="statu">
+                                    否
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="" class="col-xs-3 control-label">商品描述</label>
+                            <div class="col-xs-5 ckeditor">
+                                <textarea name="proDesc" rows="5" class="form-control input-sm"></textarea>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-xs-8">
+                                <button class="btn btn-success btn-sm pull-right">保 存</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- 模板 -->
+    <script type="text/html" id="tpl">
+        <option value="">请选择品牌</option>
+        {{each rows as val}}
+        <option value="{{val.id}}">{{val.brandName}}</option>
+        {{/each}}
+    </script>
+    <script src="./assets/jquery/jquery.min.js"></script>
+    <script src="./assets/jquery-form/jquery.form.min.js"></script>
+    <script src="./assets/art-template/template-web.js"></script>
+    <script src="./assets/bootstrap/js/bootstrap.min.js"></script>
+    <script src="./assets/nprogress/nprogress.js"></script>
+    <script src="./js/common.js"></script>
+    <script>
+        // 通过表单填写商品信息，然后获取这些数据
+        // 再提交给服务端
+
+        $('form').ajaxForm({
+            url: '/api/product/addProduct',
+            type: 'post',
+            success: function (info) {
+                console.log(info)
+            }
+        })
+
+        // 获取所有的品牌
+        $.ajax({
+            url: '/api/category/querySecondCategoryPaging',
+            type: 'get',
+            data: {
+                page: 1,
+                pageSize: 100
+            },
+            success: function (info) {
+                console.log(info);
+                var html = template('tpl', info);
+
+                // 添加DOM
+                $('select').html(html);
+            }
+        });
+
+        // 封面上传
+        // a) 上传的预览，会拿到后端上传后的地址
+        // b) 将图片上传后的地址再次发送到服务端存入数据库
+
+        $('#upfile').on('change', function () {
+            // 用户选择的待上传的文件
+            console.log(this.files[0]);
+
+            var _this = $(this);
+
+            // 通过 xhr 实现异步的上传
+            // 需要先通过 FormData 将文件转成二进制
+            var data = new FormData();
+            console.log(this.files);
+            
+            data.append('pic1', this.files[0]);
+
+            $.ajax({
+                url: '/api/product/addProductPic',
+                type: 'post',
+                data: data,
+                // 如果使用 jQuery ajax 上传
+                // 必须做如下配置
+                contentType: false,
+                processData: false,
+                success: function (info) {
+                    console.log(info);
+
+                    // 图片预览
+                    $('.preview img').attr('src', '/api' + info.picAddr);
+                    // 将图片路径添加到input中伴随表单一起提交
+
+                    // 将数组对象转成字符串
+                    // 方便将其存入 input 的 value
+                    var pics = JSON.stringify([info]);
+                    $('input[type="hidden"]').val(pics);
+
+                    // 将input type=file 的表单删除
+                    // 目的是不要让 jquery.form.js
+                    // 修改 Content-Type
+                    _this.remove();
+                }
+            })
+        })
+    </script>
+</body>
+
+</html>

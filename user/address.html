@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0"/>
+    <meta content="yes" name="apple-mobile-web-app-capable">
+    <meta content="black" name="apple-mobile-web-app-status-bar-style">
+    <meta content="telephone=no" name="format-detection">
+    <title>收货地址管理</title>
+    <link type="image/x-icon" rel="shortcut icon" href="../images/favicon.ico">
+    <link rel="stylesheet" href="../res/mui/css/mui.min.css"/>
+    <link rel="stylesheet" href="../res/fontAwesome/css/font-awesome.min.css"/>
+    <link rel="stylesheet" href="../css/common.css"/>
+    <link rel="stylesheet" href="../css/user.css"/>
+    <style type="text/css">
+        .add_address {
+            display: block;
+            margin: 20px 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="cz_layout bgg">
+        <header class="cz_topBar">
+            <a href="javascript:history.back();" class="icon_back fa fa-arrow-left"></a>
+            <span class="title">收货地址管理</span>
+        </header>
+        <div class="cz_container">
+            <ul class="mui-table-view" id="address">
+
+            </ul>
+            <a href="/user/addAddress.html" class="mui-btn mui-btn-primary add_address">添加地址</a>
+        </div>
+        <footer class="cz_tabs">
+            <a class="tab_home fa fa-home" href="../index.html"><span>首页</span></a>
+            <a class="tab_cate fa fa-bars" href="../cate.html"><span>分类</span></a>
+            <a class="tab_cart fa fa-shopping-cart" href="../cart.html"><span>购物车</span></a>
+            <a class="tab_user fa fa-user" href="../user/index.html"><span>会员中心</span></a>
+        </footer>
+    </div>
+    <script type="text/html" id="tpl">
+        {{each lists as val}}
+        <li class="mui-table-view-cell">
+            <div class="mui-slider-right mui-disabled">
+                <a href="javascript:;" data-id="{{val.id}}" class="mui-btn mui-btn-red btn_delete">删除</a>
+            </div>
+            <a href="/user/editAddress.html?id={{val.id}}" class="mui-navigate-right mui-slider-handle">
+                <div class="delivery">邮编：<span>{{val.postCode}}</span>&nbsp;收货人：<span>{{val.recipients}}</span></div>
+                <div class="address">{{val.address}} {{val.addressDetail}}</div>
+            </a>
+        </li>
+        {{/each}}
+    </script>
+    <script type="text/javascript" src="../js/jquery.min.js"></script>
+    <script type="text/javascript" src="../js/template-web.js"></script>
+    <script src="../res/mui/js/mui.min.js"></script>
+    <script type="text/javascript">
+        // 获取用户的收货地址
+        // 发送请求
+        $.ajax({
+            // /api = http://localhost:3000
+            url: '/api/address/queryAddress',
+            type: 'get',
+            success: function (info) {
+
+                // 需要登录
+                if(info.error) return location.href = '/user/login.html?url=' + location.href;
+
+                // 获取了用户的地址
+
+                // console.log(info);
+                // 借助模板引擎将获得到的数据添加到 DOM 中
+                var html = template('tpl', {lists: info});
+
+                // console.log(html)
+
+                $('#address').html(html);
+            }
+        })
+
+        $('#address').on('click', '.btn_delete', function () {
+
+            // 获取DOM数据
+            var id = $(this).attr('data-id');
+            var _this = $(this);
+
+            // 发送请求
+            $.ajax({
+                url: '/api/address/deleteAddress',
+                type: 'post',
+                data: {id: id},
+                success: function (info) {
+                    // console.log(info)
+                    
+                    if(info.success) {
+                        _this.parents('li').fadeOut(function () {
+                            $(this).remove();
+                        });
+                    }
+                }
+            });
+        })
+    </script>
+</body>
+</html>

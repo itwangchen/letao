@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0"/>
+    <meta content="yes" name="apple-mobile-web-app-capable">
+    <meta content="black" name="apple-mobile-web-app-status-bar-style">
+    <meta content="telephone=no" name="format-detection">
+    <title>传智云购-分类</title>
+    <link type="image/x-icon" rel="shortcut icon" href="images/favicon.ico">
+    <link rel="stylesheet" href="res/mui/css/mui.min.css"/>
+    <link rel="stylesheet" href="res/fontAwesome/css/font-awesome.min.css"/>
+    <link rel="stylesheet" href="css/common.css"/>
+    <link rel="stylesheet" href="css/cate.css"/>
+</head>
+<body>
+    <div class="cz_layout">
+        <header class="cz_topBar">
+            <a href="javascript:history.back();" class="icon_back fa fa-arrow-left"></a>
+            <form action="javascript:;"><input type="search" placeholder=""/></form>
+            <a href="search.html" class="icon_search fa fa-search"></a>
+        </header>
+        <div class="cz_container">
+            <div class="cate_slide" id="topWrap">
+            </div>
+            <div class="cate_content">
+                <div class="mui-scroll-wrapper">
+                    <div>
+                        <span class="title">热门品牌购</span>
+                        <ul class="mui-clearfix">
+                            <li><a href="#"><img src="images/brand1.png" alt=""/><p>耐克</p></a></li>
+                            <li><a href="#"><img src="images/brand2.png" alt=""/><p>耐克</p></a></li>
+                            <li><a href="#"><img src="images/brand3.png" alt=""/><p>耐克</p></a></li>
+                            <li><a href="#"><img src="images/brand4.png" alt=""/><p>耐克</p></a></li>
+                            <li><a href="#"><img src="images/brand5.png" alt=""/><p>耐克</p></a></li>
+                            <li><a href="#"><img src="images/brand6.png" alt=""/><p>耐克</p></a></li>
+                            <li><a href="#"><img src="images/brand7.png" alt=""/><p>耐克</p></a></li>
+                            <li><a href="#"><img src="images/brand8.png" alt=""/><p>耐克</p></a></li>
+                            <li><a href="#"><img src="images/brand1.png" alt=""/><p>耐克</p></a></li>
+                        </ul>
+                        <div id="childWrp">
+                            
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <footer class="cz_tabs">
+            <a class="tab_home fa fa-home" href="index.html"><span>首页</span></a>
+            <a class="tab_cate fa fa-bars now" href="cate.html"><span>分类</span></a>
+            <a class="tab_cart fa fa-shopping-cart" href="cart.html"><span>购物车</span></a>
+            <a class="tab_user fa fa-user" href="user/index.html"><span>会员中心</span></a>
+        </footer>
+    </div>
+    <!-- 模板顶级 -->
+    <script type="text/html" id="top">
+        <ul>
+            {{each rows as val}}
+            <li data-id="{{val.id}}">{{val.categoryName}}</li>
+            {{/each}}
+        </ul>
+    </script>
+    <script type="text/html" id="child">
+        <span class="title">{{text}}</span>
+        <ul class="mui-clearfix">
+            {{each rows as val}}
+            <li>
+                <a href="#">
+                    <img src="/api{{val.brandLogo}}" alt=""/>
+                    <p>{{val.brandName}}</p>
+                </a>
+            </li>
+            {{/each}}
+        </ul>
+    </script>
+    <script src="./js/jquery.min.js"></script>
+    <script src="./js/template-web.js"></script>
+    <script src="./res/mui/js/mui.min.js"></script>
+    <script>
+
+        // 取出顶级分类
+        $.ajax({
+            url: '/api/category/queryTopCategory',
+            type: 'get',
+            success: function (info) {
+                console.log(info);
+
+                // 调用模板引擎
+                var html = template('top', info);
+
+                // 添加DOM
+                $('#topWrap').html(html);
+
+                // 模拟触发li的click事件
+                $('#topWrap li:first-child').trigger('click');
+            }
+        })
+
+        // 获取二级分类
+        $('#topWrap').on('click', 'li', function () {
+
+            // 切换点击元素的状态
+            $(this).addClass('now').siblings().removeClass('now');
+
+            // 获取顶级分类的 id
+            var id = $(this).attr('data-id');
+            var text = $(this).text();
+
+            // 发送请求获取相应的二级分类
+            $.ajax({
+                url: '/api/category/querySecondCategory',
+                type: 'get',
+                data: {id: id},
+                success: function (info) {
+                    console.log(info)
+
+                    // 顶级分类名称
+                    info.text = text;
+
+                    // 调用模板引擎
+                    var html = template('child', info);
+                    // 添加 DOM
+                    $('#childWrp').html(html);
+                }
+            });
+        })
+
+        mui(function(){
+            mui('.mui-scroll-wrapper').scroll();
+        });
+    </script>
+</body>
+</html>
